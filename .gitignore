@@ -1,5 +1,14 @@
-node_modules
-.idea
-coverage
-.vscode
+```gitignore
+# Dependências do Node.js
+node_modules/
+
+# Configurações de IDEs e editores
+.idea/
+.vscode/
+
+# Relatórios de cobertura de testes
+coverage/
+
+# Arquivos de metadados do macOS
 .DS_Store
+```
