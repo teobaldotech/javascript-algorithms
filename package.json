@@ -1,19 +1,17 @@
+
 {
   "name": "javascript-algorithms-and-data-structures",
   "version": "0.0.4",
   "description": "Algorithms and data structures implemented in JavaScript",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/trekhleb/javascript-algorithms.git"
+    "url": "https://github.com/trekhleb/javascript-algorithms.git"
   },
   "keywords": [
     "computer-science",
-    "cs",
     "algorithms",
     "data-structures",
     "javascript",
-    "algorithm",
-    "javascript-algorithms",
     "sorting-algorithms",
     "graph",
     "tree",
@@ -29,11 +27,16 @@
   "main": "index.js",
   "scripts": {
     "lint": "eslint \"src/**/*.js\"",
+    "lint:fix": "eslint \"src/**/*.js\" --fix",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:ci": "jest --ci --coverage --runInBand",
     "coverage": "jest --coverage",
-    "ci": "npm run lint && npm run test:ci",
+    "check": "npm run lint && npm run test:ci",
+    "audit": "npm audit",
+    "audit:ci": "npm audit --audit-level=high",
+    "ci": "npm run check",
+    "verify": "npm run check && npm run audit:ci",
     "prepare": "husky"
   },
   "devDependencies": {
