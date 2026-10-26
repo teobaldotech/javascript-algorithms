@@ -1,40 +1,88 @@
-module.exports = {
-  // The bail config option can be used here to have Jest stop running tests after
-  // the first failure.
-  bail: false,
+import js from '@eslint/js';
+import typescriptEslint from '@typescript-eslint/eslint-plugin';
+import tsParser from '@typescript-eslint/parser';
+import vitest from '@vitest/eslint-plugin';
+import importHelpers from 'eslint-plugin-import-helpers';
+import prettier from 'eslint-plugin-prettier';
+import react from 'eslint-plugin-react';
+import reactHooks from 'eslint-plugin-react-hooks';
+import globals from 'globals';
 
-  // Indicates whether each individual test should be reported during the run.
-  verbose: false,
-
-  // Indicates whether the coverage information should be collected while executing the test
-  collectCoverage: false,
-
-  // The directory where Jest should output its coverage files.
-  coverageDirectory: './coverage/',
-
-  // If the test path matches any of the patterns, it will be skipped.
-  testPathIgnorePatterns: ['<rootDir>/node_modules/'],
-
-  // If the file path matches any of the patterns, coverage information will be skipped.
-  coveragePathIgnorePatterns: ['<rootDir>/node_modules/'],
-
-  // The pattern Jest uses to detect test files.
-  testRegex: '(/__tests__/.*|(\\.|/)(test|spec))\\.jsx?$',
-
-  // This option sets the URL for the jsdom environment.
-  // It is reflected in properties such as location.href.
-  // @see: https://github.com/facebook/jest/issues/6769
-  testEnvironmentOptions: {
-    url: 'http://localhost/',
+export default [
+  // Ignores globais
+  {
+    ignores: ['node_modules/', 'dist/', 'build/', 'coverage/'],
   },
 
-  // @see: https://jestjs.io/docs/en/configuration#coveragethreshold-object
-  coverageThreshold: {
-    global: {
-      statements: 100,
-      branches: 95,
-      functions: 100,
-      lines: 100,
+  // Configuração base JS
+  js.configs.recommended,
+
+  // Configuração principal da aplicação
+  {
+    files: ['**/*.{js,jsx,ts,tsx}'],
+    languageOptions: {
+      parser: tsParser,
+      parserOptions: {
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+        ecmaFeatures: {
+          jsx: true,
+        },
+      },
+      globals: {
+        ...globals.browser,
+        ...globals.es2021,
+      },
+    },
+    plugins: {
+      react,
+      'react-hooks': reactHooks,
+      '@typescript-eslint': typescriptEslint,
+      prettier,
+      'import-helpers': importHelpers,
+    },
+    settings: {
+      react: {
+        version: 'detect',
+      },
+    },
+    rules: {
+      ...react.configs.recommended.rules,
+      'react-hooks/rules-of-hooks': 'error',
+      'react-hooks/exhaustive-deps': 'warn',
+      'react/jsx-uses-react': 'off',
+      'react/react-in-jsx-scope': 'off',
+      'react/prop-types': 'off',
+      'prettier/prettier': 'error',
+      '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
+      'import-helpers/order-imports': [
+        'warn',
+        {
+          newlinesBetween: 'always',
+          groups': [
+            ['/^react/'],
+            ['module', 'absolute'],
+            '/^@/',
+            ['parent', 'sibling', 'index'],
+          ],
+          alphabetize: { order: 'asc', ignoreCase: true },
+        },
+      ],
     },
   },
-};
+
+  // Configuração específica para arquivos de teste do Vitest
+  {
+    files: ['src/**/*.{test,spec}.{js,jsx,ts,tsx}', 'src/__tests__/**/*.{js,jsx,ts,tsx}'],
+    plugins: {
+      vitest,
+    },
+    rules: {
+      ...vitest.configs.recommended.rules, // Aplica as regras recomendadas do Vitest
+      'vitest/no-focused-tests': 'error',  // Impede o commit acidental de fit() ou test.only()
+      'vitest/no-disabled-tests': 'warn',  // Avisa sobre xit() ou test.skip()
+      'vitest/prefer-to-have-length': 'warn',
+      'vitest/valid-expect': 'error',
+    },
+  },
+];
